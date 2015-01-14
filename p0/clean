@@ -1,0 +1,9 @@
+#!/bin/bash
+
+SCRIPT_PATH="`dirname $0`"
+TESTS_DIR="$SCRIPT_PATH/tests"
+SRC_DIR="$SCRIPT_PATH/src"
+BUILD_DIR="$SCRIPT_PATH/build"
+
+rm $TESTS_DIR/*.s
+rm $BUILD_DIR/*
