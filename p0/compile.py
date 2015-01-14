@@ -9,7 +9,7 @@ import string
 
 class my_compiler:
     #variables
-    __dict_vars = {} #dictionary of variable names to memory locations relative to ebp
+    __dict_vars = {} #dictionary of var names to memory locations relative to ebp
     __stack_offset = 0
     __generated_code = ""
 
@@ -27,14 +27,14 @@ class my_compiler:
     #       flat_ast - new flattened ast
     def flatten_sub(self, ast, tmpNum, flat_ast, __dict_vars):
         if isinstance(ast, Module):
-            self.flatten_sub(ast.node, tmpNum, flat_ast, __dict_vars)
+            self.flatten_sub(ast.node, tmpNum, flat_ast, self.__dict_vars)
             return 0
 
         elif isinstance(ast,  Stmt):
             for node in ast.nodes:
-                tmpNum = self.flatten_sub(node, tmpNum, flat_ast, __dict_vars)
+                tmpNum = self.flatten_sub(node, tmpNum, flat_ast, self.__dict_vars)
                 tmpNum += 1
-                return tmpNum
+            return tmpNum
             
         elif isinstance(ast, Printnl):
             # get tmp var to be printed
@@ -49,7 +49,7 @@ class my_compiler:
             left = self.flatten_sub(ast.left, tmpNum, flat_ast, self.__dict_vars)
             right = self.flatten_sub(ast.right, left + 1, flat_ast, self.__dict_vars)
             # build statement to add tmp vars
-            stmt = 'tmp' + str(right + 1) + ' = tmp' + str(right)
+            stmt = 'tmp' + str(right + 1) + ' = tmp' + str(left) + ' + tmp' + str(right)
             flat_ast.node.nodes.append(compiler.parse(stmt).node.nodes[0])
             return right + 1
 
@@ -62,7 +62,6 @@ class my_compiler:
             
         elif isinstance(ast, CallFunc):
             # CallFunc always refers to an input() in p0
-            # So, build a statement calling input() and storing it to a tmp var
             stmt = 'tmp' + str(tmpNum) + ' = input()'
             flat_ast.node.nodes.append(compiler.parse(stmt).node.nodes[0])
             return tmpNum
@@ -148,18 +147,18 @@ class my_compiler:
 
         elif isinstance(ast, Assign):
             # Get the name of the variable being assigned to (l value)
-            var_name = ast.nodes[0].name
+            varName = ast.nodes[0].name
             
             #emit our expression (RHS)
             self.generate_x86_code(ast.expr, _dict_vars)
             
             #now, the result of that should be stored in %eax, so do the assignment
             try:
-                var_offset = _dict_vars[var_name]
+                var_offset = _dict_vars[varName]
                 self.__generated_code += "movl %eax, -"+str(var_offset)+"(%ebp)\n"
             except KeyError:
                 #this means that the variable was not yet assigned
-                var_offset = self._update_dict_vars(var_name)
+                var_offset = self._update_dict_vars(varName)
                 self.__generated_code += "movl %eax, -"+str(var_offset)+"(%ebp)\n"
 
         elif isinstance(ast, Discard):
@@ -174,6 +173,7 @@ class my_compiler:
             raise Exception("Error: Unrecognized node type")                             
 
     def __init__(self,codefile):
+        #print self.flatten(compiler.parseFile(codefile))
         self.generate_x86_code(self.flatten(compiler.parseFile(codefile)),self.__dict_vars)
         self._encapsulate_generated_code()
 
