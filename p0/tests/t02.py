@@ -1,2 +1,3 @@
-print 10 + 5
+x = input() + 100
+print x + input()
 
