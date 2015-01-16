@@ -4,6 +4,7 @@ tmp2=tmp1
 tmp3=tmp1
 tmp4=tmp0
 tmp5=tmp1
+tmp1+3+input()
 tmp6=tmp0
 tmp7=tmp1
 print tmp3
