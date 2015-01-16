@@ -3,6 +3,7 @@
 printing
 
 assignment
-    x = 10
+
+     x = ...
 
 arithmetic operations binary + and uniary -
