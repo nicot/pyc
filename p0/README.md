@@ -2,6 +2,7 @@
 ## subset of Python 2 that includes:
 printing
 
-assignment, x = ...
+assignment
+    x = 10
 
-arithmetic operations binary +, uniary -
+arithmetic operations binary + and uniary -
