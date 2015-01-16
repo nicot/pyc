@@ -81,7 +81,7 @@ class my_compiler:
             return right
             
         elif isinstance(ast, Discard):
-            self.flatten_sub(ast.expt, tmpNum, flat_ast, self.__dict_vars)
+            self.flatten_sub(ast.expr, tmpNum, flat_ast, self.__dict_vars)
             return tmpNum
         
         elif isinstance(ast, Const):
