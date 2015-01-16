@@ -1,6 +1,9 @@
 #!/usr/bin/python
 
 #P0 compiler
+#    printing
+#    assignment, x = ...
+#    arithmetic operations binary +, uniary -
 
 from compiler.ast import *
 import compiler
@@ -81,7 +84,7 @@ class my_compiler:
             return right
             
         elif isinstance(ast, Discard):
-            self.flatten_sub(ast.expt, tmpNum, flat_ast, self.__dict_vars)
+            self.flatten_sub(ast.expr, tmpNum, flat_ast, self.__dict_vars)
             return tmpNum
         
         elif isinstance(ast, Const):
@@ -90,7 +93,8 @@ class my_compiler:
             return tmpNum
             
         else:
-            raise Exception("Error: Unrecognized node type")
+            print ast
+            raise Exception("Error: Unrecognized node type")          
             
     def _update_dict_vars(self, varName):
         self.__stack_offset = self.__stack_offset + 4

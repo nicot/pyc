@@ -1,3 +1,3 @@
 x = input() + 100
-print x + input()
+print x
 
