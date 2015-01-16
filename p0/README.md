@@ -1,5 +1,5 @@
 # P0 compiler
-## subset of python 2
-    printing
-    assignment, x = ...
-    arithmetic operations binary +, uniary -
+## subset of Python 2 that includes:
+printing
+assignment, x = ...
+arithmetic operations binary +, uniary -
