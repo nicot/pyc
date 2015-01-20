@@ -1,10 +1,16 @@
 #!/bin/bash
-set -eu -o pipefail
+set -u -o pipefail
 
 SCRIPT_PATH=$(dirname $0)
 TESTS_DIR="$SCRIPT_PATH/tests"
 SRC_DIR="$SCRIPT_PATH/src"
 BUILD_DIR="$SCRIPT_PATH/build"
+which python2 &> /dev/null
+if [[ $? != 0 ]]; then
+    PYTHON=$(which python)
+else
+    PYTHON=$(which python2)
+fi
 
 rm $TESTS_DIR/*.s
 rm $BUILD_DIR/*
@@ -16,7 +22,7 @@ do
     EXE=$BUILD_DIR/$(basename $NOEXT)
 	
 	# Compile each file and run through gcc
-	python $SRC_DIR/compile.py $FILE
+	$PYTHON $SRC_DIR/compile.py $FILE
 
 	# Note: WARNING MESSAGES ARE OFF
 	gcc -m32 -lm -w "$NOEXT.s" $SRC_DIR/*.c -lm -o $EXE
@@ -29,10 +35,10 @@ do
 	#output of the python interpreter
     if [[ -e "$NOEXT.in" ]]; then
         $EXE > $EXE.a.out < "$NOEXT.in" 
-        python $FILE > $EXE.py.out < "$NOEXT.in"
+        $PYTHON $FILE > $EXE.py.out < "$NOEXT.in"
     else
         $EXE > $EXE.a.out
-        python $FILE > $EXE.py.out
+        $PYTHON $FILE > $EXE.py.out
     fi
 	diff $EXE.a.out $EXE.py.out
 	if [ $? != 0 ]; then
