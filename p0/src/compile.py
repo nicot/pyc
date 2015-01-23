@@ -10,6 +10,8 @@ import compiler
 import sys
 import string
 
+debug = False
+
 class my_compiler:
     #variables
     __dict_vars = {} #dictionary of var names to memory locations relative to ebp
@@ -20,8 +22,12 @@ class my_compiler:
         return self.__generated_code
 
     def flatten(self, ast):
+        if debug:
+            print "starting ast:\n", ast, "\n"
         flat_ast = compiler.ast.Module(None, compiler.ast.Stmt([]))
         self.flatten_sub(ast, 0, flat_ast, self.__dict_vars)
+        if(debug):
+            print "\nfinished flattened ast:\n", flat_ast, "\n"
         return flat_ast
 
     # Recursive flattening function
