@@ -1,11 +1,13 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 
 #P0 compiler
 
 from compiler.ast import *
-import compiler
 import sys
 import string
+import lex as lexer
+import yacc
+import compiler
 
 class my_compiler:
     #variables
@@ -172,15 +174,65 @@ class my_compiler:
         else:
             raise Exception("Error: Unrecognized node type")                             
 
-    def __init__(self,codefile):
-        #print self.flatten(compiler.parseFile(codefile))
-        self.generate_x86_code(self.flatten(compiler.parseFile(codefile)),self.__dict_vars)
+    def __init__(self, codefile):
+        ast = parser(codefile)
+        flatast = self.flatten(ast)
+        self.generate_x86_code(flatast, self.__dict_vars)
         self._encapsulate_generated_code()
+
+class parser:
+    def lex(self, code):
+        tokens = ('PRINT', 'INT', 'PLUS')
+        t_PRINT = r'print'
+        t_PLUS = r'\+'
+        def t_INT(t):
+            r'\d+'
+            t.value = int(t.value)
+        t_ignore = ' \t'
+        def t_newline(t):
+            r'\n+'
+            t.lexer.lineno += t.value.count("\n")
+
+        def t_error(t):
+            print("Illegal character '%s'" % t.value[0])
+            t.lexer.skip(1)
+        lexer.lex()
+        
+        lexer.input(code)
+        while True:
+            tok = lexer.token()
+            if not tok: break
+            print(tok)
+
+    def parse(self, tokens):
+        precedence = (
+                ('nonassoc', 'PRINT'),
+                ('left', 'PLUS')
+                )
+        def p_print_statement(t):
+            'statement : PRINT expression'
+            t[0] = Printnl(t[2], None)
+        def p_plus_expression(t):
+            'expression : expression PLUS expression'
+            t[0] = Add((t[1], t[3]))
+        def p_int_expression(t):
+            'expression : INT'
+            t[0] = Const(t[1])
+        def p_error(t):
+            print("Syntax error at '%s'" % t.value)
+        yacc.yacc()
+
+    def __init__(self, codefile):
+        f = open(codefile, "r")
+        code = f.read()
+        f.close()
+        tokens = self.lex(code)
+        ast = self.parse(tokens)
+        return ast
 
 myfile = sys.argv[1]
 basename = myfile[:len(myfile)-3]
 compileObj = my_compiler(myfile)
-file = open(basename+".s","w")
-file.write(compileObj.get_generated_code())
-file.close()
-
+f = open(basename+".s","w")
+f.write(compileObj.get_generated_code())
+f.close()
