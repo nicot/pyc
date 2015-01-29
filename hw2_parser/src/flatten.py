@@ -13,10 +13,17 @@ debug = False
 # takes a parsed python ast and converts it to a flat version
 class python_ast:
     flat_ast = compiler.ast.Module(None, compiler.ast.Stmt([]))
-            
-    def pretty_print(self, ast, level):
-        print ast
-        self.pretty_print(ast.node, level+1)
+    
+    # prints each node in the statement on its own line for readability
+    def pretty_print(self, ast):
+        if isinstance(ast, Module):    
+            print "Module:"
+            self.pretty_print(ast.node)
+        elif isinstance(ast, Stmt):
+            print "  stmt: "
+            for node in ast.nodes:                
+                print "     ", node
+
         
     def flatten(self, ast):
         if debug:

@@ -17,6 +17,7 @@ myfile = sys.argv[1]
 ast = my_parser().parseFile(myfile)
 
 flatAST = python_ast().flatten(ast)
+
 x86code = translate(flatAST)
 
 # save the generated assembly code to FILENAME.s
