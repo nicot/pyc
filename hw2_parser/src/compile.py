@@ -4,7 +4,7 @@ from compiler.ast import *
 import compiler
 import sys
 import string
-from flatten import *
+from python_ast import *
 from translate import *
 from my_parser import *
 
