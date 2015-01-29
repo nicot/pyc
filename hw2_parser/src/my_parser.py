@@ -104,9 +104,13 @@ class my_parser:
         def p_l_paren_expression_r_paren(t):
             'expression : L_PAREN expression R_PAREN'
             t[0] = t[2]
-		
+
+
         def p_error(t):
-            print "Syntax Error at '%s'" % t.value		
+            if not t:
+                return
+            else:
+                print "Syntax Error at '%s'" % t		
 
         self.parser = yacc.yacc(debug=0, write_tables=0)
 

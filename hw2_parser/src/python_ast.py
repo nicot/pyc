@@ -28,7 +28,10 @@ class python_ast:
     def flatten(self, ast):
         if debug:
             print "starting ast:\n", ast, "\n"
-        self.flatten_sub(ast, 0)
+        if ast == None:
+            return self.flat_ast
+        else:
+            self.flatten_sub(ast, 0)
         if(debug):
             print "\nfinished flattened ast:\n", self.flat_ast, "\n"
         return self.flat_ast

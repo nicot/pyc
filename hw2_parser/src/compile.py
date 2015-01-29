@@ -15,7 +15,7 @@ if(len(sys.argv) > 2):
 
 myfile = sys.argv[1]
 ast = my_parser().parseFile(myfile)
-
+# ast = compiler.parseFile(myfile)
 flatAST = python_ast().flatten(ast)
 
 x86code = translate(flatAST)
