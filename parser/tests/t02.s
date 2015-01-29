@@ -3,9 +3,9 @@ main:
 pushl %ebp
 movl %esp, %ebp
 subl $20,%esp
-call input
-movl %eax, -4(%ebp)
 movl $100, %eax
+movl %eax, -4(%ebp)
+movl $2, %eax
 movl %eax, -8(%ebp)
 movl -4(%ebp), %eax
 movl %eax, %edx
