@@ -14,11 +14,11 @@ class my_parser:
         reserved = {'print' : 'PRINT',
                     'input' : 'INPUT'}
 		
-        tokens = ['INT','PLUS','ASSIGN','NEGATE','NAME', 'R_PAREN', 'L_PAREN'] + list(reserved.values())
+        tokens = ['INT','PLUS','ASSIGN','NEG','NAME', 'R_PAREN', 'L_PAREN'] + list(reserved.values())
 	
         t_PLUS  = r'\+'
         t_ASSIGN= r'='
-        t_NEGATE= r'-'
+        t_NEG= r'-'
         t_R_PAREN= r'\)'
         t_L_PAREN= r'\('
         t_ignore_COMMENT = r'\#.*' #ignore comments
@@ -52,19 +52,16 @@ class my_parser:
 
         # PARSER
 
-        #define precedence
         precedence = (
             ('right','ASSIGN'),
             ('left','PLUS'),
-            ('right', 'NEGATE'),
+            ('right', 'NEG'),
             ('left','L_PAREN','R_PAREN'),
         )
 		
-        # Empty statement object that the parser will add to.
+        # Empty statement object that will be added to
         self.stmtList = Stmt([])
-
-        
-        #define parse logic
+    
         def p_program_module(t):
             'program : module'	
             t[0] = Module(None, t[1])
@@ -93,7 +90,7 @@ class my_parser:
             'expression : expression PLUS expression'
             t[0] = Add((t[1], t[3]))
         def p_negate_expression(t):
-            'expression : NEGATE expression'
+            'expression : NEG expression'
             t[0] = UnarySub(t[2])
         def p_int_expression(t):
             'expression : INT'
@@ -109,8 +106,7 @@ class my_parser:
             t[0] = t[2]
 		
         def p_error(t):
-            print "Syntax Error at '%s'" % t.value
-		
+            print "Syntax Error at '%s'" % t.value		
 
         self.parser = yacc.yacc()
 
@@ -122,19 +118,10 @@ class my_parser:
             if not tok: break
             print tok
 
-    # Desc: Clears the list of statements that the parser appends to
-    #	as it builds the tree. Needs to be called in between calls
-    #	to parse() and parseFile()
-    def clearStatements(self):
-        self.stmtList.nodes=[]
-	
     def parseFile(self, path):
-        self.clearStatements()
         file_to_parse = open(path, 'r')
         text_to_parse = file_to_parse.read()
         return self.parser.parse(text_to_parse)
 
     def parse(self, to_parse):
-        # Clear stmtList. See comment in parseFile()
-        self.clearStatements()
         return self.parser.parse(to_parse)
