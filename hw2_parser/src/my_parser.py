@@ -108,7 +108,7 @@ class my_parser:
         def p_error(t):
             print "Syntax Error at '%s'" % t.value		
 
-        self.parser = yacc.yacc()
+        self.parser = yacc.yacc(debug=0, write_tables=0)
 
 		
     def testLexer(self, to_lex):
