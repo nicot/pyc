@@ -181,30 +181,44 @@ class my_compiler:
         self._encapsulate_generated_code()
 
 class parser:
+    tokens = ('PRINT', 'INT', 'PLUS', 'MINUS', 'EQUALS', 'INPUT', 'LPARENS', 'RPARENS', 'NAME')
     def lex(self, code):
-        tokens = ('PRINT', 'INT', 'PLUS')
+        tokens = self.tokens
         t_PRINT = r'print'
         t_PLUS = r'\+'
+        t_MINUS = r'-'
+        t_EQUALS = r'='
+        t_INPUT = r'input'
+        t_LPARENS = r'\('
+        t_RPARENS = r'\)'
+        t_ignore = ' \t'
+
+        def t_NAME(t):
+            r'[a-zA-Z][a-zA-Z0-9_]*'
+            return t
         def t_INT(t):
             r'\d+'
             t.value = int(t.value)
-        t_ignore = ' \t'
+            return t
         def t_newline(t):
             r'\n+'
             t.lexer.lineno += t.value.count("\n")
-
         def t_error(t):
             print("Illegal character '%s'" % t.value[0])
             t.lexer.skip(1)
-        lexer.lex()
         
+        lexer.lex()
+        lexedTokens = []
         lexer.input(code)
         while True:
             tok = lexer.token()
-            if not tok: break
             print(tok)
-
-    def parse(self, tokens):
+            if not tok: break
+            lexedTokens.append(tok)
+        return lexedTokens
+        
+    def parse(self, lexedTokens):
+        tokens = self.tokens
         precedence = (
                 ('nonassoc', 'PRINT'),
                 ('left', 'PLUS')
@@ -220,13 +234,19 @@ class parser:
             t[0] = Const(t[1])
         def p_error(t):
             print("Syntax error at '%s'" % t.value)
+
         yacc.yacc()
+        for tok in lexedTokens:
+            yacc.parse(tok)
+
 
     def __init__(self, codefile):
+        # Take a path to a file with python code
+        # Return a python AST
         f = open(codefile, "r")
         code = f.read()
         f.close()
-        tokens = self.lex(code)
+        lexedTokens = self.lex(code)
         ast = self.parse(tokens)
         return ast
 
