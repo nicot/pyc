@@ -1,4 +1,4 @@
-# P0 compiler
+# P0 compiler and parser
 ## subset of Python 2 that includes:
 printing
 
