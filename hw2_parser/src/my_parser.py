@@ -132,6 +132,5 @@ class my_parser:
         return self.parser.parse(text_to_parse)
 
     def parse(self, to_parse):
-        print "lex:", self.testLexer(to_parse)
         return self.parser.parse(to_parse)
         
