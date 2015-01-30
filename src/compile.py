@@ -175,15 +175,19 @@ class my_compiler:
             raise Exception("Error: Unrecognized node type")                             
 
     def __init__(self, codefile):
-        ast = parser(codefile)
+        f = open(codefile, "r")
+        code = f.read()
+        f.close()
+        p = parser()
+        ast = p.parse(code)
         flatast = self.flatten(ast)
         self.generate_x86_code(flatast, self.__dict_vars)
         self._encapsulate_generated_code()
 
 class parser:
-    tokens = ('PRINT', 'INT', 'PLUS', 'MINUS', 'EQUALS', 'INPUT', 'LPARENS', 'RPARENS', 'NAME')
-    def lex(self, code):
-        tokens = self.tokens
+    def parse(self, code):
+        # lex
+        tokens = ('PRINT', 'INT', 'PLUS', 'MINUS', 'EQUALS', 'INPUT', 'LPARENS', 'RPARENS', 'NAME')
         t_PRINT = r'print'
         t_PLUS = r'\+'
         t_MINUS = r'-'
@@ -206,26 +210,26 @@ class parser:
         def t_error(t):
             print("Illegal character '%s'" % t.value[0])
             t.lexer.skip(1)
-        
+
         lexer.lex()
-        lexedTokens = []
-        lexer.input(code)
-        while True:
-            tok = lexer.token()
-            print(tok)
-            if not tok: break
-            lexedTokens.append(tok)
-        return lexedTokens
-        
-    def parse(self, lexedTokens):
-        tokens = self.tokens
+
+        # parse
         precedence = (
                 ('nonassoc', 'PRINT'),
                 ('left', 'PLUS')
                 )
+        def p_module(t):
+            'module : statement'
+            t[0] = Module(None, Stmt([t[1]]))
+        def p_discard(t):
+            'statement : expression'
+            t[0] = Discard(t[1])
         def p_print_statement(t):
             'statement : PRINT expression'
-            t[0] = Printnl(t[2], None)
+            t[0] = Printnl(list(t[2]), None)
+        def p_assign(t):
+            'statement : NAME EQUALS expression'
+            t[0] = Assign([AssName(t[1], 'OP_ASSIGN')], t[3])
         def p_plus_expression(t):
             'expression : expression PLUS expression'
             t[0] = Add((t[1], t[3]))
@@ -233,21 +237,11 @@ class parser:
             'expression : INT'
             t[0] = Const(t[1])
         def p_error(t):
-            print("Syntax error at '%s'" % t.value)
+            print("Syntax error at '%s'" % t)
 
         yacc.yacc()
-        for tok in lexedTokens:
-            yacc.parse(tok)
-
-
-    def __init__(self, codefile):
-        # Take a path to a file with python code
-        # Return a python AST
-        f = open(codefile, "r")
-        code = f.read()
-        f.close()
-        lexedTokens = self.lex(code)
-        ast = self.parse(tokens)
+        ast = yacc.parse(code)
+        print ast
         return ast
 
 myfile = sys.argv[1]
