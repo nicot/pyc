@@ -13,7 +13,7 @@ if(len(sys.argv) > 2):
     if(sys.argv[2] == '-debug'):
        debug = True
 
-myfile = sys.argv[1]
+myfile = sys.argv[1] 
 ast = my_parser().parseFile(myfile)
 # ast = compiler.parseFile(myfile)
 flatAST = python_ast().flatten(ast)

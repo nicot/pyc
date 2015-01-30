@@ -61,13 +61,22 @@ class my_parser:
 		
         # Empty statement object that will be added to
         self.stmtList = Stmt([])
-    
+        #self.stmtList = Module(None, Stmt([]))
+
         def p_program_module(t):
-            'program : module'	
+            'program : module'
             t[0] = Module(None, t[1])
+        def p_empty(t):
+            'empty :'
+            t[0] = Stmt([])
         def p_module_statement(t):
-            'module : statement'
+            '''module : statement
+                      | empty'''            
+
             t[0] = t[1]
+
+
+
         def p_statements_statement(t):
             '''statement : statement simple_statement
 			 | simple_statement'''
@@ -104,16 +113,11 @@ class my_parser:
         def p_l_paren_expression_r_paren(t):
             'expression : L_PAREN expression R_PAREN'
             t[0] = t[2]
-
-
+           
         def p_error(t):
-            if not t:
-                return
-            else:
-                print "Syntax Error at '%s'" % t		
-
+            print "Syntax Error at '%s'" % t		
+        
         self.parser = yacc.yacc(debug=0, write_tables=0)
-
 		
     def testLexer(self, to_lex):
         self.lexer.input(to_lex)
@@ -128,4 +132,6 @@ class my_parser:
         return self.parser.parse(text_to_parse)
 
     def parse(self, to_parse):
+        print "lex:", self.testLexer(to_parse)
         return self.parser.parse(to_parse)
+        
