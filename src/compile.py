@@ -180,6 +180,8 @@ class my_compiler:
         f.close()
         p = parser()
         ast = p.parse(code)
+        print ast
+        print compiler.parse(code)
         flatast = self.flatten(ast)
         self.generate_x86_code(flatast, self.__dict_vars)
         self._encapsulate_generated_code()
@@ -218,30 +220,35 @@ class parser:
                 ('nonassoc', 'PRINT'),
                 ('left', 'PLUS')
                 )
-        def p_module(t):
+        def p_module(p):
             'module : statement'
-            t[0] = Module(None, Stmt([t[1]]))
-        def p_discard(t):
+            p[0] = Module(None, Stmt([p[1]]))
+        def p_none(p):
+            'module : '
+            p[0] = Module(None, Stmt([]))
+        def p_discard(p):
             'statement : expression'
-            t[0] = Discard(t[1])
-        def p_print_statement(t):
+            p[0] = Discard(p[1])
+        def p_print_statement(p):
             'statement : PRINT expression'
-            t[0] = Printnl(list(t[2]), None)
-        def p_assign(t):
+            p[0] = Printnl(list(p[1]), None)
+        def p_assign(p):
             'statement : NAME EQUALS expression'
-            t[0] = Assign([AssName(t[1], 'OP_ASSIGN')], t[3])
-        def p_plus_expression(t):
+            p[0] = Assign([AssName(p[1], 'OP_ASSIGN')], p[3])
+        def p_plus_expression(p):
             'expression : expression PLUS expression'
-            t[0] = Add((t[1], t[3]))
-        def p_int_expression(t):
+            p[0] = Add((p[1], p[3]))
+        def p_name_expression(p):
+            'expression : NAME'
+            p[0] = p[1]
+        def p_int_expression(p):
             'expression : INT'
-            t[0] = Const(t[1])
-        def p_error(t):
-            print("Syntax error at '%s'" % t)
+            p[0] = Const(p[1])
+        def p_error(p):
+            print("Syntax error at '%s'" % p)
 
         yacc.yacc()
         ast = yacc.parse(code)
-        print ast
         return ast
 
 myfile = sys.argv[1]
