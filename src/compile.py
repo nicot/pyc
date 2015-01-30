@@ -190,7 +190,6 @@ class parser:
     def parse(self, code):
         # lex
         tokens = ('PRINT', 'INT', 'PLUS', 'MINUS', 'EQUALS', 'INPUT', 'LPARENS', 'RPARENS', 'NAME')
-        t_PRINT = r'print'
         t_PLUS = r'\+'
         t_MINUS = r'-'
         t_EQUALS = r'='
@@ -199,6 +198,9 @@ class parser:
         t_RPARENS = r'\)'
         t_ignore = ' \t'
 
+        def t_PRINT(t):
+            r'print'
+            return t
         def t_NAME(t):
             r'[a-zA-Z][a-zA-Z0-9_]*'
             return t
@@ -213,7 +215,12 @@ class parser:
             print("Illegal character '%s'" % t.value[0])
             t.lexer.skip(1)
 
-        lexer.lex()
+        #lexer.lex()
+        #lexer.input(code)
+        #while True:
+            #tok = lexer.token()
+            #if not tok: break
+            #print tok
 
         # parse
         precedence = (
@@ -228,22 +235,23 @@ class parser:
             'module : '
             p[0] = Module(None, Stmt([]))
         def p_print_statement(p):
-            'statement : PRINT expression'
-            p[0] = Printnl(list(p[1]), None)
+            'statement : PRINT expr'
+            p[0] = Printnl([p[2]], None)
         def p_assign(p):
-            'statement : NAME EQUALS expression'
-            p[0] = Assign([AssName(p[1], 'OP_ASSIGN')], p[3])
-        def p_discard(p):
-            'statement : expression'
-            p[0] = Discard(p[1])
-        def p_plus_expression(p):
-            'expression : expression PLUS expression'
+            '''statement : NAME EQUALS expr
+                         | expr'''
+            if len(p) > 2 and p[2] == '=':
+                p[0] = Assign([AssName(p[1], 'OP_ASSIGN')], p[3])
+            else:
+                p[0] = Discard(p[1])
+        def p_plus_expr(p):
+            'expr : expr PLUS expr'
             p[0] = Add((p[1], p[3]))
-        def p_name_expression(p):
-            'expression : NAME'
+        def p_name_expr(p):
+            'expr : NAME'
             p[0] = p[1]
-        def p_int_expression(p):
-            'expression : INT'
+        def p_int_expr(p):
+            'expr : INT'
             p[0] = Const(p[1])
         def p_error(p):
             print("Syntax error at '%s'" % p)
