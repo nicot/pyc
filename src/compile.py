@@ -217,6 +217,7 @@ class parser:
 
         # parse
         precedence = (
+                ('left', 'EQUALS'),
                 ('nonassoc', 'PRINT'),
                 ('left', 'PLUS')
                 )
@@ -226,15 +227,15 @@ class parser:
         def p_none(p):
             'module : '
             p[0] = Module(None, Stmt([]))
-        def p_discard(p):
-            'statement : expression'
-            p[0] = Discard(p[1])
         def p_print_statement(p):
             'statement : PRINT expression'
             p[0] = Printnl(list(p[1]), None)
         def p_assign(p):
             'statement : NAME EQUALS expression'
             p[0] = Assign([AssName(p[1], 'OP_ASSIGN')], p[3])
+        def p_discard(p):
+            'statement : expression'
+            p[0] = Discard(p[1])
         def p_plus_expression(p):
             'expression : expression PLUS expression'
             p[0] = Add((p[1], p[3]))
