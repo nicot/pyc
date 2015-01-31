@@ -189,7 +189,7 @@ class my_compiler:
 class parser:
     def parse(self, code):
         # lex
-        tokens = ('PRINT', 'INT', 'PLUS', 'MINUS', 'EQUALS', 'INPUT', 'LPARENS', 'RPARENS', 'NAME')
+        tokens = ('PRINT', 'INT', 'PLUS', 'MINUS', 'EQUALS', 'INPUT', 'LPARENS', 'RPARENS', 'NAME', 'NEWLINE')
         t_PLUS = r'\+'
         t_MINUS = r'-'
         t_EQUALS = r'='
@@ -208,14 +208,15 @@ class parser:
             r'\d+'
             t.value = int(t.value)
             return t
-        def t_newline(t):
+        def t_NEWLINE(t):
             r'\n+'
-            t.lexer.lineno += t.value.count("\n")
+            t.type = "NEWLINE"
+            t.lexer.lineno += len(t.value)
         def t_error(t):
             print("Illegal character '%s'" % t.value[0])
             t.lexer.skip(1)
 
-        #lexer.lex()
+        lexer.lex()
         #lexer.input(code)
         #while True:
             #tok = lexer.token()
@@ -228,12 +229,19 @@ class parser:
                 ('nonassoc', 'PRINT'),
                 ('left', 'PLUS')
                 )
+        statements = []
         def p_module(p):
-            'module : statement'
-            p[0] = Module(None, Stmt([p[1]]))
-        def p_none(p):
-            'module : '
-            p[0] = Module(None, Stmt([]))
+            'module : lstatement'
+            p[0] = Module(None, Stmt(statements))
+        def p_sstatement(p):
+            'lstatement : statement'
+            statements.append(p[1])
+        def p_emptystatement(p):
+            'lstatement :'
+        def p_lstatement(p):
+            'lstatement : lstatement statement'
+            for i in p[2:]:
+                statements.append(i)
         def p_print_statement(p):
             'statement : PRINT expr'
             p[0] = Printnl([p[2]], None)
@@ -249,7 +257,7 @@ class parser:
             p[0] = Add((p[1], p[3]))
         def p_name_expr(p):
             'expr : NAME'
-            p[0] = p[1]
+            p[0] = Name(p[1])
         def p_int_expr(p):
             'expr : INT'
             p[0] = Const(p[1])

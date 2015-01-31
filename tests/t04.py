@@ -1,3 +1,8 @@
-x = 2
-x = 3
-print x
+a = 2
+print a
+a = 3
+print a
+a = 4
+print a
+a = 5
+print a
