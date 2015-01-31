@@ -180,8 +180,8 @@ class my_compiler:
         f.close()
         p = parser()
         ast = p.parse(code)
-        print ast
-        print compiler.parse(code)
+        #print ast
+        #print compiler.parse(code)
         flatast = self.flatten(ast)
         self.generate_x86_code(flatast, self.__dict_vars)
         self._encapsulate_generated_code()
@@ -189,15 +189,17 @@ class my_compiler:
 class parser:
     def parse(self, code):
         # lex
-        tokens = ('PRINT', 'INT', 'PLUS', 'MINUS', 'EQUALS', 'INPUT', 'LPARENS', 'RPARENS', 'NAME', 'NEWLINE')
+        tokens = ('PRINT', 'INT', 'PLUS', 'MINUS', 'EQUALS', 'INPUT', 'LPARENS', 'RPARENS', 'NAME')
         t_PLUS = r'\+'
         t_MINUS = r'-'
         t_EQUALS = r'='
-        t_INPUT = r'input'
         t_LPARENS = r'\('
         t_RPARENS = r'\)'
         t_ignore = ' \t'
 
+        def t_INPUT(t):
+            r'input'
+            return t
         def t_PRINT(t):
             r'print'
             return t
@@ -229,7 +231,8 @@ class parser:
         precedence = (
                 ('left', 'EQUALS'),
                 ('nonassoc', 'PRINT'),
-                ('left', 'PLUS')
+                ('left', 'PLUS'),
+                ('left', 'MINUS'),
                 )
         statements = []
         def p_module(p):
@@ -244,6 +247,9 @@ class parser:
             'lstatement : lstatement statement'
             for i in p[2:]:
                 statements.append(i)
+        def p_input_expr(p):
+            'expr : INPUT LPARENS RPARENS'
+            p[0] = CallFunc(Name('input'), [], None, None)
         def p_print_statement(p):
             'statement : PRINT expr'
             p[0] = Printnl([p[2]], None)
@@ -260,6 +266,9 @@ class parser:
         def p_name_expr(p):
             'expr : NAME'
             p[0] = Name(p[1])
+        def p_neg_expr(p):
+            'expr : MINUS expr'
+            p[0] = UnarySub(p[2])
         def p_int_expr(p):
             'expr : INT'
             p[0] = Const(p[1])
