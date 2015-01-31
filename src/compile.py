@@ -208,6 +208,8 @@ class parser:
             r'\d+'
             t.value = int(t.value)
             return t
+        def t_COMMENT(t):
+            r'\#.*'
         def t_NEWLINE(t):
             r'\n+'
             t.type = "NEWLINE"
