@@ -105,26 +105,3 @@ class python_ast:
             
         else:
             raise Exception("Error: Unrecognized node type")          
-
-class x86ast:
-    class mov:
-        def __init__(self, src, dest):
-            self.src = src
-            self.dest = dest
-
-        def __repr__(self):
-            return "mov " +  self.src + ", " +  self.dest
-
-    class pushl:
-        def __init__(self, operand):
-            self.operand = operand
-
-        def __repr__(self):
-            return "pushl " + self.operand
-
-    class 
-
-
-a = x86ast.mov('a', 'b')
-a.src = 'asdf'
-print a

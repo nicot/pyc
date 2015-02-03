@@ -23,7 +23,29 @@ class x86ast:
         def __repr__(self):
             return "addl " + self.left + ", " + self.right
 
+    class subl:
+        def __init__(self, left, right):
+            self.left = left
+            self.right = right
 
-a = x86ast.mov('a', 'b')
-a.src = 'asdf'
-print a
+        def __repr__(self):
+            return "subl " + self.left + ", " + self.right
+
+    class call:
+        def __init__(self, name):
+            self.name = name
+
+        def __repr__(self):
+            return "call " + self.name
+
+    class leave:
+        def __repr__(self):
+            return "leave"
+
+    class ret:
+        def __repr__(self):
+            return "ret"
+
+    class main:
+        def __repr__(self):
+            return ".globl main\nmain:"
