@@ -1,8 +1,10 @@
 from compiler.ast import *
+from x86ast import *
 
-debug = False
+def select(flatAST):
+    options = { '' : stmt }
 
-class translate:          
+class translate:
     __dict_vars = {} #dictionary of var names to memory locations relative to ebp
     __stack_offset = 0
     __generated_code = ""

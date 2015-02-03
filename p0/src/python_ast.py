@@ -55,7 +55,7 @@ class python_ast:
             toPrint = self.flatten_sub(ast.nodes[0], tmpNum)
             # build statement 
             stmt = 'print tmp' + str(toPrint)
-            self.flat_ast.node.nodes.append(compiler.parse(stmt).node.nodes[0])
+            self.flat_ast.node.nodes.append(Printnl([toPrint], None))
             return toPrint
 
         elif isinstance(ast, Add):

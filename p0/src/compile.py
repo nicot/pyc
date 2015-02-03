@@ -5,6 +5,7 @@ import sys
 import string
 import python_ast 
 import translate 
+import x86ast
 
 debug = False
 if(len(sys.argv) > 2):
@@ -12,9 +13,10 @@ if(len(sys.argv) > 2):
        debug = True
 
 myfile = sys.argv[1] 
+
 ast = compiler.parseFile(myfile)
 flatAST = python_ast.python_ast().flatten(ast)
-
+#x86AST = translate.selectInstructions.select(flatAST)
 x86code = translate.translate(flatAST)
 
 # save the generated assembly code to FILENAME.s
