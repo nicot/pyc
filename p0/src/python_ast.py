@@ -54,7 +54,8 @@ class python_ast:
             # get tmp var to be printed
             toPrint = self.flatten_sub(ast.nodes[0], tmpNum)
             # build statement 
-            stmt = 'print tmp' + str(toPrint)
+            #stmt = 'print tmp' + str(toPrint)
+            print ast
             self.flat_ast.node.nodes.append(Printnl([toPrint], None))
             return toPrint
 
@@ -99,9 +100,7 @@ class python_ast:
             return tmpNum
         
         elif isinstance(ast, Const):
-            stmt = 'tmp' + str(tmpNum) + ' = ' + str(ast.value)
-            self.flat_ast.node.nodes.append(compiler.parse(stmt).node.nodes[0])
-            return tmpNum
+            return Const(129)
             
         else:
             raise Exception("Error: Unrecognized node type")          

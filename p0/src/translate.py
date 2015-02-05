@@ -1,5 +1,5 @@
 from compiler.ast import *
-from x86ast import *
+from x86_ast import *
 
 def select(flatAST):
     options = { '' : stmt }
@@ -71,6 +71,7 @@ class translate:
             try:
                 self.__generated_code += "movl -" + str(self.__dict_vars[ast.name]) + "(%ebp), %eax\n"
             except KeyError:
+                print ast
                 raise Exception("Error: Unassigned variable")
             return
 
@@ -99,4 +100,5 @@ class translate:
             return   
 
         else:
+            print ast
             raise Exception("Error: Unrecognized node type")                             
